@@ -17,30 +17,15 @@ class DatabaseSeeder extends Seeder
 
         // User::factory()->create([
         //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
+        //     'email' => 'test@archer.com',
         // ]);
-
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('password'),
-            'role' => 'admin', // Admin role
-        ]);
         
-        User::create([
-            'name' => 'Manager User',
-            'email' => 'manager@example.com',
-            'password' => bcrypt('password'),
-            'role' => 'manager', // Manager role
+        $this->call([
+            UserSeeder::class,
+            DepartmentSeeder::class,
+            ProjectSeeder::class,
+            SubProjectSeeder::class,
         ]);
-        
-        User::create([
-            'name' => 'Employee User',
-            'email' => 'employee@example.com',
-            'password' => bcrypt('password'),
-            'role' => 'employee', // Employee role
-        ]);
-        
         
     }
 }
