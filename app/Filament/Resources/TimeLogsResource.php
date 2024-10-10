@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TimeLogsResource\Pages;
 use App\Filament\Resources\TimeLogsResource\RelationManagers;
+use App\Models\Subproject;
 use App\Models\TimeLog;
 use App\Models\User;
 use Filament\Forms;
@@ -18,6 +19,12 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\DateRangeFilter;
+use App\Models\Department;
+use App\Models\Project;
+use Filament\Tables\Filters\Filter;
+use Carbon\Carbon;
 
 class TimeLogsResource extends Resource
 {
@@ -29,11 +36,18 @@ class TimeLogsResource extends Resource
     {
         return $form
             ->schema([
+                Select::make('subproject_id')
+                    ->label('Sub Project')
+                    ->options(Subproject::pluck('name', 'id'))
+                    ->searchable()
+                    ->required(),
+
                 Select::make('user_id')
                     ->label('User')
                     ->options(User::where('role','employee')->pluck('name', 'id'))
                     ->searchable()
                     ->required(),
+
                 DatePicker::make('date')
                     ->required()
                     ->label('Date'),
@@ -58,38 +72,93 @@ class TimeLogsResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                TextColumn::make('user.name')
-                    ->label('User')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('date')
-                    ->date()
-                    ->sortable(),
+        ->columns([
+            TextColumn::make('subproject.name')
+                ->label('Subproject')
+                ->searchable()
+                ->sortable(),
 
-                TextColumn::make('start_time')
-                    ->time()
-                    ->sortable(),
+            TextColumn::make('user.name')
+                ->label('User')
+                ->searchable()
+                ->sortable(),
 
-                TextColumn::make('end_time')
-                    ->time()
-                    ->sortable(),
+            TextColumn::make('date')
+                ->date()
+                ->sortable(),
 
-                TextColumn::make('total_hours')
-                    ->numeric(2)
-                    ->sortable(),
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            TextColumn::make('start_time')
+                ->time()
+                ->sortable(),
+
+            TextColumn::make('end_time')
+                ->time()
+                ->sortable(),
+
+            TextColumn::make('total_hours')
+                ->numeric(2)
+                ->sortable(),
+        ])
+        ->filters([
+            // Filter by Employee (User)
+            SelectFilter::make('user_id')
+                ->label('Employee')
+                ->options(User::where('role', 'employee')->pluck('name', 'id'))
+                ->searchable(),
+
+            // Filter by Department
+            SelectFilter::make('subproject.project.department_id')
+                ->label('Department')
+                ->options(Department::pluck('name', 'id'))
+                ->searchable()
+                ->query(function (Builder $query, $value) {
+                    return $query->whereHas('subproject.project.department', function ($query) use ($value) {
+                        $query->where('id', $value);
+                    });
+                }),
+
+            // Filter by Project
+            SelectFilter::make('subproject.project_id')
+                ->label('Project')
+                ->options(Project::pluck('name', 'id'))
+                ->searchable()
+                ->query(function (Builder $query, $value) {
+                    return $query->whereHas('subproject.project', function ($query) use ($value) {
+                        $query->where('id', $value);
+                    });
+                }),
+
+            // Filter by Subproject
+            SelectFilter::make('subproject_id')
+                ->label('Subproject')
+                ->options(Subproject::pluck('name', 'id'))
+                ->searchable(),
+
+            // Custom Date Range Filter
+            Filter::make('date_range')
+                ->label('Date Range')
+                ->form([
+                    Forms\Components\DatePicker::make('start_date')->label('Start Date'),
+                    Forms\Components\DatePicker::make('end_date')->label('End Date'),
+                ])
+                ->query(function (Builder $query, array $data) {
+                    if ($data['start_date'] ?? null) {
+                        $query->where('date', '>=', Carbon::parse($data['start_date']));
+                    }
+
+                    if ($data['end_date'] ?? null) {
+                        $query->where('date', '<=', Carbon::parse($data['end_date']));
+                    }
+                }),
+        ])
+        ->actions([
+            Tables\Actions\EditAction::make(),
+        ])
+        ->bulkActions([
+            Tables\Actions\BulkActionGroup::make([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]),
+        ]);    
     }
 
     public static function getRelations(): array
