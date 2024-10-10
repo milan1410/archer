@@ -44,7 +44,7 @@ class TimeLogsResource extends Resource
 
                 Select::make('user_id')
                     ->label('User')
-                    ->options(User::where('role','employee')->pluck('name', 'id'))
+                    ->options(User::where('role', 'employee')->pluck('name', 'id'))
                     ->searchable()
                     ->required(),
 
@@ -72,94 +72,101 @@ class TimeLogsResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        ->columns([
-            TextColumn::make('subproject.name')
-                ->label('Subproject')
-                ->searchable()
-                ->sortable(),
+            ->columns([
+                TextColumn::make('subproject.name')
+                    ->label('Subproject')
+                    ->searchable()
+                    ->sortable(),
 
-            TextColumn::make('user.name')
-                ->label('User')
-                ->searchable()
-                ->sortable(),
+                TextColumn::make('user.name')
+                    ->label('User')
+                    ->searchable()
+                    ->sortable(),
 
-            TextColumn::make('date')
-                ->date()
-                ->sortable(),
+                TextColumn::make('date')
+                    ->date()
+                    ->sortable(),
 
-            TextColumn::make('start_time')
-                ->time()
-                ->sortable(),
+                TextColumn::make('start_time')
+                    ->time()
+                    ->sortable(),
 
-            TextColumn::make('end_time')
-                ->time()
-                ->sortable(),
+                TextColumn::make('end_time')
+                    ->time()
+                    ->sortable(),
 
-            TextColumn::make('total_hours')
-                ->numeric(2)
-                ->sortable(),
-        ])
-        ->filters([
-            // Filter by Employee (User)
-            SelectFilter::make('user_id')
-                ->label('Employee')
-                ->options(User::where('role', 'employee')->pluck('name', 'id'))
-                ->searchable(),
+                TextColumn::make('total_hours')
+                    ->numeric(2)
+                    ->sortable(),
+            ])
+            ->filters([
+                // Filter by Employee (User)
+                SelectFilter::make('user_id')
+                    ->label('Employee')
+                    ->options(User::where('role', 'employee')->pluck('name', 'id')->toArray())
+                    ->searchable(),
 
-            // Filter by Department
-            SelectFilter::make('subproject.project.department_id')
-                ->label('Department')
-                ->options(Department::pluck('name', 'id'))
-                ->searchable()
-                ->query(function (Builder $query, $value) {
-                    return $query->whereHas('subproject.project.department', function ($query) use ($value) {
-                        $query->where('id', $value);
-                    });
-                }),
+                // Filter by Department
+                SelectFilter::make('department_id')
+                    ->label('Department')
+                    ->options(Department::pluck('name', 'id')->toArray()) // Fetch directly from department table
+                    ->query(function ($query, $data) {
+                        if ($data['value']) {
+                            $query->whereHas('subproject.project.department', function ($q) use ($data) {
+                                $q->where('id', $data['value']);
+                            });
+                        }
+                    })            
+                    ->searchable(),
 
-            // Filter by Project
-            SelectFilter::make('subproject.project_id')
-                ->label('Project')
-                ->options(Project::pluck('name', 'id'))
-                ->searchable()
-                ->query(function (Builder $query, $value) {
-                    return $query->whereHas('subproject.project', function ($query) use ($value) {
-                        $query->where('id', $value);
-                    });
-                }),
+                // Filter by Project
+                SelectFilter::make('project_id')
+                    ->label('Project')
+                    ->options(Project::pluck('name', 'id')->toArray()) // Fetch directly from project table
+                    ->query(function ($query, $data) {
+                        if ($data['value']) {
+                            $query->whereHas('subproject.project', function ($q) use ($data) {
+                                $q->where('id', $data['value']);
+                            });
+                        }
+                    })            
+                    ->searchable(),
 
-            // Filter by Subproject
-            SelectFilter::make('subproject_id')
-                ->label('Subproject')
-                ->options(Subproject::pluck('name', 'id'))
-                ->searchable(),
+                // Filter by Subproject
+                SelectFilter::make('subproject_id')
+                    ->label('Subproject')
+                    ->options(Subproject::pluck('name', 'id')->toArray())
+                    ->searchable(),
 
-            // Custom Date Range Filter
-            Filter::make('date_range')
-                ->label('Date Range')
-                ->form([
-                    Forms\Components\DatePicker::make('start_date')->label('Start Date'),
-                    Forms\Components\DatePicker::make('end_date')->label('End Date'),
-                ])
-                ->query(function (Builder $query, array $data) {
-                    if ($data['start_date'] ?? null) {
-                        $query->where('date', '>=', Carbon::parse($data['start_date']));
-                    }
+                // Custom Date Range Filter
+                Filter::make('date_range')
+                    ->label('Date Range')
+                    ->form([
+                        Forms\Components\DatePicker::make('start_date')->label('Start Date'),
+                        Forms\Components\DatePicker::make('end_date')->label('End Date'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if ($data['start_date'] ?? null) {
+                            $query->where('date', '>=', Carbon::parse($data['start_date']));
+                        }
 
-                    if ($data['end_date'] ?? null) {
-                        $query->where('date', '<=', Carbon::parse($data['end_date']));
-                    }
-                }),
-        ])
-        ->actions([
-            Tables\Actions\EditAction::make(),
-        ])
-        ->bulkActions([
-            Tables\Actions\BulkActionGroup::make([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]),
-        ]);    
+                        if ($data['end_date'] ?? null) {
+                            $query->where('date', '<=', Carbon::parse($data['end_date']));
+                        }
+                    }),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
     }
+
+
+
 
     public static function getRelations(): array
     {

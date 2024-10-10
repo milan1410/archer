@@ -11,6 +11,12 @@ class TimeLog extends Model
 
     protected $fillable = ['user_id', 'subproject_id', 'date', 'start_time', 'end_time', 'total_hours'];
 
+    protected $casts = [
+        'date' => 'date',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+    ];
+
     public function subproject()
     {
         return $this->belongsTo(Subproject::class);
@@ -20,5 +26,4 @@ class TimeLog extends Model
     {
         return $this->belongsTo(User::class);
     }
-
 }
