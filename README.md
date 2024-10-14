@@ -7,13 +7,13 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## Installation
-composer install
-npm i
-php artisan migrate
-php artisan db:seed
-npm run dev
-php artisan serve
+## Installation Guide
+```composer install
+```npm i
+```php artisan migrate
+```php artisan db:seed
+```npm run dev
+```php artisan serve
 
 ## About Laravel
 
