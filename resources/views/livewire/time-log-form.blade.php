@@ -1,5 +1,5 @@
 <div class="p-4 max-w-lg mx-auto">
-    <form wire:submit.prevent="submit" class="space-y-4 bg-black rounded-lg shadow-md p-5">
+    <form wire:submit.prevent="submit" class="space-y-4 bg-white rounded-lg shadow-md p-5">
         <!-- Form fields -->
         {{ $this->form }}
         

@@ -81,7 +81,6 @@ class TimeLogForm extends Component implements Forms\Contracts\HasForms
     }
     public function render()
     {
-        return view('livewire.time-log-form')
-        ->layout('layouts.app');  // Specify the layout here
+        return view('livewire.time-log-form');
     }
 }

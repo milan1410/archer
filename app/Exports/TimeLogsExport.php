@@ -3,20 +3,47 @@
 namespace App\Exports;
 
 use App\Models\TimeLog;
-use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class TimeLogsExport implements FromCollection, WithHeadings
 {
-    public function collection()
+    protected $userId;
+
+    // Inject user ID into the export class
+    public function __construct($userId)
     {
-        return TimeLog::where('employee_id', Auth::id())
-            ->get(['department_id', 'project_id', 'subproject_id', 'date', 'start_time', 'end_time']);
+        $this->userId = $userId;
     }
 
+    // Fetch the logs data for the authenticated user
+    public function collection()
+    {
+        return TimeLog::with(['subproject.project.department'])
+            ->where('user_id', $this->userId)
+            ->get()
+            ->map(function ($log) {
+                return [
+                    $log->subproject->project->department->name,
+                    $log->subproject->project->name,
+                    $log->subproject->name,
+                    $log->date,
+                    $log->start_time,
+                    $log->end_time,
+                ];
+            });
+    }
+
+    // Define the headers for the CSV
     public function headings(): array
     {
-        return ['Department ID', 'Project ID', 'Subproject ID', 'Date', 'Start Time', 'End Time'];
+        return [
+            'Department',
+            'Project',
+            'Subproject',
+            'Date',
+            'Start Time',
+            'End Time',
+        ];
     }
 }

@@ -17,12 +17,12 @@
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('time-log.form') }}" :active="request()->routeIs('time-log.form')">
+                    <x-nav-link href="{{ route('time-log') }}" :active="request()->routeIs('time-log')">
                         Time Log
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('logged-hours.index') }}" :active="request()->routeIs('logged-hours.index')">
+                    <x-nav-link href="{{ route('logged-hours') }}" :active="request()->routeIs('logged-hours')">
                         Logged Hours
                     </x-nav-link>
                 </div>

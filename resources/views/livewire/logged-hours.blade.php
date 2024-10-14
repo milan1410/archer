@@ -6,7 +6,7 @@
         Download CSV
     </button>
 
-    <div class="overflow-x-auto bg-black text-white rounded-lg shadow-md p-5">
+    <div class="overflow-x-auto bg-white rounded-lg shadow-md p-5">
         <table class="min-w-full border border-gray-300">
             <thead>
                 <tr class="">
