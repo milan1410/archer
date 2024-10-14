@@ -31,6 +31,23 @@
  npm run dev
  php artisan serve
 
+#Admin OR Manager URL 
+ http://127.0.0.1:8000/admin
+
+ Login Credentials
+ 1. U: admin@archer.com 
+    P: password
+
+ 2. U: manager@archer.com 
+    P: password
+
+#Front URL 
+ http://127.0.0.1:8000/
+ 
+ Login Credentials
+    U: employee@archer.com
+    P: password
+
 ```
 
 ## About Laravel
