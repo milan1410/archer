@@ -8,12 +8,12 @@
 </p>
 
 ## Installation Guide
-```composer install
-```npm i
-```php artisan migrate
-```php artisan db:seed
-```npm run dev
-```php artisan serve
+```bash composer install
+```bash npm i
+```bash php artisan migrate
+```bash php artisan db:seed
+```bash npm run dev
+```bash php artisan serve
 
 ## About Laravel
 
