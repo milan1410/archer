@@ -28,7 +28,8 @@ class TimeLogForm extends Component implements Forms\Contracts\HasForms
                 ->label('Department')
                 ->options(Department::all()->pluck('name', 'id'))
                 ->reactive()
-                ->afterStateUpdated(fn ($state) => $this->reset('project_id', 'subproject_id')),
+                ->afterStateUpdated(fn ($state) => $this->reset('project_id', 'subproject_id'))
+                ->required(),
 
             Select::make('project_id')
                 ->label('Project')
@@ -66,12 +67,21 @@ class TimeLogForm extends Component implements Forms\Contracts\HasForms
             'total_hours' => $totalHours,
         ]);
 
-        $this->form->reset();
-        session()->flash('message', 'Time log saved successfully!');
+    // Flash message
+    session()->flash('message', 'Time log saved successfully!');
+    return redirect()->route('logged-hours.index');
+    // Optionally, trigger a refresh or reset form fields
+    // $this->resetForm();
+    // $this->dispatchBrowserEvent('flash-message-displayed');
     }
-
+    public function resetForm()
+    {
+        // Livewire's reset() method resets all the component properties
+        $this->reset(['department_id', 'project_id', 'subproject_id', 'date', 'start_time', 'end_time']);
+    }
     public function render()
     {
-        return view('livewire.time-log-form');
+        return view('livewire.time-log-form')
+        ->layout('layouts.app');  // Specify the layout here
     }
 }
