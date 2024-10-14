@@ -8,12 +8,28 @@
 </p>
 
 ## Installation Guide
-```bash composer install
-```bash npm i
-```bash php artisan migrate
-```bash php artisan db:seed
-```bash npm run dev
-```bash php artisan serve
+```bash
+# Get the code!
+ git clone https://github.com/milan1410/archer.git && cd archer
+
+# Install PHP dependencies
+ composer install 
+
+# Install JS dependencies
+ npm install or npm i
+
+#Set Environment Variable
+ Rename file ..env.example to .env
+
+# Database structure 
+ php artisan migrate
+
+# Database dummy data
+ php artisan db:seed
+
+# Run Project
+ npm run dev
+ php artisan serve
 
 ## About Laravel
 
